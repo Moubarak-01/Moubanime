@@ -1,10 +1,10 @@
 // frontend/src/components/Navbar.tsx
-// CHANGE THIS LINE to use .png
-import logo from '../assets/header-logo.png';
+import logo from '../assets/header-logo.png'; // Importing your custom logo
 
 export const Navbar = () => {
   return (
     <nav className="bg-[#23252b] px-6 py-4 flex items-center justify-between sticky top-0 z-50 shadow-md">
+      {/* Logo Area */}
       <div className="flex items-center gap-6">
         <a href="/">
           <img 
@@ -21,6 +21,7 @@ export const Navbar = () => {
         </div>
       </div>
 
+      {/* Right Side */}
       <div className="flex items-center gap-4">
         <button className="text-gray-300 hover:text-white">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
