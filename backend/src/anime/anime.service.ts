@@ -1,16 +1,12 @@
 import { Injectable } from '@nestjs/common';
-// Import ANIME directly
-import { ANIME } from '@consumet/extensions'; 
+import { ANIME } from '@consumet/extensions';
 
 @Injectable()
 export class AnimeService {
-  // If Gogoanime is missing, let's try 'Gogoanime' as a string or a direct class
-  // But first, let's try to use a different provider to see if it fixes the error:
-  // Try 'Zoro' (now called HiAnime) if Gogoanime is fighting you.
-  private readonly provider = new ANIME.Gogoanime(); 
-}
+  // Gogoanime is gone, so we use Hianime (formerly Zoro) which is in your error list
+  private readonly provider = new ANIME.Hianime();
 
-  // 1. Search for an anime (e.g., "Naruto")
+  // 1. Search for an anime
   async search(query: string) {
     try {
       const results = await this.provider.search(query);
@@ -20,7 +16,7 @@ export class AnimeService {
     }
   }
 
-  // 2. Get details (Episodes, Description, Image)
+  // 2. Get details
   async getInfo(id: string) {
     try {
       const info = await this.provider.fetchAnimeInfo(id);
@@ -30,7 +26,7 @@ export class AnimeService {
     }
   }
 
-  // 3. Get the actual video links
+  // 3. Get video links
   async getLinks(episodeId: string) {
     try {
       const links = await this.provider.fetchEpisodeSources(episodeId);
