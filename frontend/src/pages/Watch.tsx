@@ -2,26 +2,30 @@ import { useEffect, useState, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { Navbar } from '../components/Navbar';
-import { MediaPlayer, MediaProvider } from '@vidstack/react';
+import { MediaPlayer, MediaProvider, Poster } from '@vidstack/react';
 import '@vidstack/react/player/styles/default/theme.css';
 import '@vidstack/react/player/styles/default/layouts/video.css';
 import { defaultLayoutIcons, DefaultVideoLayout } from '@vidstack/react/player/layouts/default';
-import Hls from 'hls.js';
+
+// Helper to bypass CORS (Browser blocking)
+// In a real "pro" app, you would build your own proxy in NestJS, but this works for now.
+const PROXY_URL = "https://m3u8-proxy-cors-worker.qwertyuiop.workers.dev/?url=";
 
 export const Watch = () => {
-  const { id } = useParams(); // Get anime ID from URL
+  const { id } = useParams();
   const [episodes, setEpisodes] = useState<any[]>([]);
   const [currentEpisode, setCurrentEpisode] = useState<string | null>(null);
   const [videoUrl, setVideoUrl] = useState<string>('');
+  const [animeInfo, setAnimeInfo] = useState<any>(null); // To store title/image
   
-  // 1. Fetch Anime Info (Episode List)
+  // 1. Fetch Anime Info & Episodes
   useEffect(() => {
     const fetchInfo = async () => {
       try {
         const { data } = await axios.get(`http://localhost:3000/anime/info/${id}`);
         setEpisodes(data.episodes);
+        setAnimeInfo(data); // Save full info for the poster
         if (data.episodes.length > 0) {
-          // Automatically select first episode
           setCurrentEpisode(data.episodes[0].id);
         }
       } catch (error) {
@@ -31,15 +35,21 @@ export const Watch = () => {
     fetchInfo();
   }, [id]);
 
-  // 2. Fetch Streaming Link when Episode changes
+  // 2. Fetch Video Stream
   useEffect(() => {
     if (!currentEpisode) return;
     const fetchStream = async () => {
       try {
+        setVideoUrl(''); // Reset video to show loading state
         const { data } = await axios.get(`http://localhost:3000/anime/watch/${currentEpisode}`);
-        // Find the "default" or "auto" quality link
+        
+        // Find the best quality source (m3u8)
         const source = data.sources.find((s: any) => s.quality === 'default' || s.quality === 'auto') || data.sources[0];
-        setVideoUrl(source.url);
+        
+        // Combine Proxy + Video URL
+        if (source?.url) {
+          setVideoUrl(`${PROXY_URL}${encodeURIComponent(source.url)}`);
+        }
       } catch (error) {
         console.error("Error fetching stream:", error);
       }
@@ -52,16 +62,24 @@ export const Watch = () => {
       <Navbar />
       
       <div className="max-w-7xl mx-auto px-4 py-6">
-        {/* Video Player Container */}
+        {/* Video Player */}
         <div className="aspect-video w-full bg-black rounded-xl overflow-hidden shadow-2xl border border-[#333]">
           {videoUrl ? (
-             <MediaPlayer src={videoUrl} aspectRatio="16/9" load="eager">
-               <MediaProvider />
+             <MediaPlayer title={animeInfo?.title} src={videoUrl} aspectRatio="16/9" load="eager">
+               <MediaProvider>
+                 {/* This shows the anime image before playing */}
+                 <Poster 
+                   className="absolute inset-0 block h-full w-full rounded-md opacity-0 transition-opacity data-[visible]:opacity-100 object-cover" 
+                   src={animeInfo?.image} 
+                   alt={animeInfo?.title} 
+                 />
+               </MediaProvider>
                <DefaultVideoLayout icons={defaultLayoutIcons} />
              </MediaPlayer>
           ) : (
-            <div className="w-full h-full flex items-center justify-center text-gray-500">
-              Loading Stream...
+            <div className="w-full h-full flex flex-col items-center justify-center text-gray-500 gap-4">
+              <div className="w-12 h-12 border-4 border-[#f47521] border-t-transparent rounded-full animate-spin"></div>
+              <p>Loading Stream...</p>
             </div>
           )}
         </div>
