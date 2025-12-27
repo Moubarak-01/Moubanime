@@ -72,7 +72,7 @@ export const Home = () => {
               alt={heroAnime.title} 
               className="w-full h-full object-cover object-top opacity-80"
             />
-            {/* GRADIENT OVERLAYS (Fixes Readability) */}
+            {/* GRADIENT OVERLAYS */}
             <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent"></div>
             <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-transparent to-transparent"></div>
           </div>
@@ -85,9 +85,6 @@ export const Home = () => {
             <h1 className="text-3xl md:text-xl font-black mb-2 md:mb-4 leading-tight drop-shadow-xl">
               {heroAnime.title}
             </h1>
-            {/* <p className="text-gray-300 mb-6 line-clamp-3 text-sm md:text-lg drop-shadow-md hidden md:block">
-            {heroAnime.description || "Experience the best anime streaming..."}
-            </p> */}
             
             <div className="flex gap-3 md:gap-4">
               <Link 
@@ -116,28 +113,30 @@ export const Home = () => {
       {/* 2. SCROLLABLE ROWS */}
       <div className="px-4 md:px-8 py-6 space-y-10">
         
-        {/* Trending Row */}
+        {/* Trending Row - NOW USES LANDSCAPE VARIANT */}
         <section>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg md:text-2xl font-bold border-l-4 border-[#f47521] pl-3">Trending Now</h2>
           </div>
           <div className="flex overflow-x-auto gap-3 md:gap-4 pb-4 custom-scrollbar snap-x scroll-pl-4">
             {trending.map((anime) => (
-              <div key={anime.id} className="min-w-[130px] md:min-w-[200px] snap-start">
-                <Link to={`/watch/${anime.id}`}>
-                  <AnimeCard anime={anime} />
+              <div key={anime.id} className="min-w-[200px] md:min-w-[280px] snap-start">
+                 {/* 💡 WE FORCE LANDSCAPE MODE HERE */}
+                 <Link to={`/watch/${anime.id}`}>
+                  <AnimeCard anime={anime} variant="landscape" />
                 </Link>
               </div>
             ))}
           </div>
         </section>
 
-        {/* Popular Row */}
+        {/* Popular Row - DEFAULTS TO PORTRAIT */}
         <section>
           <h2 className="text-lg md:text-2xl font-bold mb-4 border-l-4 border-[#f47521] pl-3">Most Popular</h2>
           <div className="flex overflow-x-auto gap-3 md:gap-4 pb-4 custom-scrollbar snap-x scroll-pl-4">
             {popular.map((anime) => (
               <div key={anime.id} className="min-w-[130px] md:min-w-[200px] snap-start">
+                {/* 💡 NO VARIANT = DEFAULTS TO TALL POSTERS */}
                 <Link to={`/watch/${anime.id}`}>
                   <AnimeCard anime={anime} />
                 </Link>
