@@ -82,9 +82,7 @@ App runs on: http://localhost:5173
 ```
 
 ## 🔮 Future Roadmap
-### Episode Tracking:
-Save watch history to local storage.
+**Episode Tracking:**Save watch history to local storage.
+**Next Episode Button:** Auto-play functionality.
+**Quality Selector:** Explicitly choose between 360p, 720p, and 1080p in the player.
 
-### Next Episode Button: Auto-play functionality.
-
-### Quality Selector: Explicitly choose between 360p, 720p, and 1080p in the player.
