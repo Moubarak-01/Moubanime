@@ -82,7 +82,8 @@ App runs on: http://localhost:5173
 ```
 
 ## 🔮 Future Roadmap
-### Episode Tracking: Save watch history to local storage.
+### Episode Tracking:
+Save watch history to local storage.
 
 ### Next Episode Button: Auto-play functionality.
 
