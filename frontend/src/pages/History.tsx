@@ -30,7 +30,7 @@ export const History = () => {
     <div className="min-h-screen bg-black text-white">
       <Navbar />
       
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="max-w-7xl mx-auto px-4 py-20">
         <h2 className="text-3xl font-bold mb-8 border-l-4 border-[#f47521] pl-4">
           Watch History
         </h2>

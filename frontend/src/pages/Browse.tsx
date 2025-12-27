@@ -51,10 +51,9 @@ export const Browse = () => {
     <div className="min-h-screen bg-black text-white">
       <Navbar />
       
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="max-w-7xl mx-auto px-12 py-20">
         {/* Search Bar */}
         <div className="mb-10 flex flex-col items-center">
-          <h1 className="text-3xl font-bold mb-6 text-center">Browse Anime</h1>
           <form onSubmit={searchAnime} className="w-full max-w-2xl flex">
             <input 
               type="text" 

@@ -24,7 +24,7 @@ export const MyList = () => {
     <div className="min-h-screen bg-[#000] text-white overflow-x-hidden">
       <Navbar />
       
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="max-w-7xl mx-auto px-4 py-20">
         <h1 className="text-3xl font-bold mb-8 border-l-4 border-[#f47521] pl-4">My List</h1>
         
         {myList.length > 0 ? (
