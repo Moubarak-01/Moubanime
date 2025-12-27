@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { Navbar } from '../components/Navbar';
@@ -7,9 +7,9 @@ import '@vidstack/react/player/styles/default/theme.css';
 import '@vidstack/react/player/styles/default/layouts/video.css';
 import { defaultLayoutIcons, DefaultVideoLayout } from '@vidstack/react/player/layouts/default';
 
-// Helper to bypass CORS (Browser blocking)
-// In a real "pro" app, you would build your own proxy in NestJS, but this works for now.
-const PROXY_URL = "https://m3u8-proxy-cors-worker.qwertyuiop.workers.dev/?url=";
+// CHANGE: Point to YOUR backend proxy (The "Middleman")
+// This sends the video request to your NestJS server, avoiding the browser block.
+const PROXY_URL = "http://localhost:3000/anime/proxy?url=";
 
 export const Watch = () => {
   const { id } = useParams();
@@ -35,7 +35,7 @@ export const Watch = () => {
     fetchInfo();
   }, [id]);
 
-  // 2. Fetch Video Stream
+  // 2. Fetch Video Stream (Using the Local Proxy)
   useEffect(() => {
     if (!currentEpisode) return;
     const fetchStream = async () => {
@@ -43,11 +43,12 @@ export const Watch = () => {
         setVideoUrl(''); // Reset video to show loading state
         const { data } = await axios.get(`http://localhost:3000/anime/watch/${currentEpisode}`);
         
-        // Find the best quality source (m3u8)
+        // Hianime/Zoro logic: Find the 'auto' or 'default' quality
         const source = data.sources.find((s: any) => s.quality === 'default' || s.quality === 'auto') || data.sources[0];
         
-        // Combine Proxy + Video URL
+        // Combine Local Proxy + Video URL
         if (source?.url) {
+          // This creates a URL like: http://localhost:3000/anime/proxy?url=https://hianime...
           setVideoUrl(`${PROXY_URL}${encodeURIComponent(source.url)}`);
         }
       } catch (error) {
@@ -79,7 +80,7 @@ export const Watch = () => {
           ) : (
             <div className="w-full h-full flex flex-col items-center justify-center text-gray-500 gap-4">
               <div className="w-12 h-12 border-4 border-[#f47521] border-t-transparent rounded-full animate-spin"></div>
-              <p>Loading Stream...</p>
+              <p>Loading Stream via Backend...</p>
             </div>
           )}
         </div>

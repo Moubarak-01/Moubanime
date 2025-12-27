@@ -3,10 +3,9 @@ import { ANIME } from '@consumet/extensions';
 
 @Injectable()
 export class AnimeService {
-  // Gogoanime is gone, so we use Hianime (formerly Zoro) which is in your error list
+  // Use Hianime (Zoro) since Gogoanime is not working
   private readonly provider = new ANIME.Hianime();
 
-  // 1. Search for an anime
   async search(query: string) {
     try {
       const results = await this.provider.search(query);
@@ -16,7 +15,6 @@ export class AnimeService {
     }
   }
 
-  // 2. Get details
   async getInfo(id: string) {
     try {
       const info = await this.provider.fetchAnimeInfo(id);
@@ -26,7 +24,6 @@ export class AnimeService {
     }
   }
 
-  // 3. Get video links
   async getLinks(episodeId: string) {
     try {
       const links = await this.provider.fetchEpisodeSources(episodeId);
