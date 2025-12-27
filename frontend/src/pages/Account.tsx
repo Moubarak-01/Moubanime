@@ -13,7 +13,7 @@ export const Account = () => {
     <div className="min-h-screen bg-black text-white">
       <Navbar />
       
-      <div className="max-w-2xl mx-auto px-4 py-12">
+      <div className="max-w-2xl mx-auto px-4 py-20">
         <h1 className="text-3xl font-bold mb-8 text-center">Account Settings</h1>
         
         <div className="bg-[#1a1c21] rounded-xl p-6 space-y-6 border border-gray-800">

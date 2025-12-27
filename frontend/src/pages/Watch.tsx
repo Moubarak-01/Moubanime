@@ -7,7 +7,6 @@ import '@vidstack/react/player/styles/default/theme.css';
 import '@vidstack/react/player/styles/default/layouts/video.css';
 import { defaultLayoutIcons, DefaultVideoLayout } from '@vidstack/react/player/layouts/default';
 
-// Backend Proxy URL (The Middleman)
 const PROXY_URL = "http://localhost:3000/anime/proxy?url=";
 
 export const Watch = () => {
@@ -108,15 +107,11 @@ export const Watch = () => {
              className="absolute inset-0 bg-cover bg-center bg-no-repeat"
              style={{ backgroundImage: `url(${animeInfo.image})` }}
            >
-             {/* Gradients */}
              <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/50 to-transparent" />
              <div className="absolute inset-0 bg-gradient-to-r from-[#0a0a0a] via-[#0a0a0a]/60 to-transparent" />
            </div>
 
-           {/* Hero Content */}
-           {/* THE FIX: using inline 'style' to force 400px padding.
-               This bypasses any Tailwind conflicts and guarantees the text starts way down.
-           */}
+           {/* Hero Content with Forced Padding */}
            <div 
              className="relative w-full p-6 md:p-12 lg:p-16 flex flex-col gap-6 z-10"
              style={{ paddingTop: '400px' }} 
@@ -212,7 +207,7 @@ export const Watch = () => {
         </div>
       )}
 
-      {/* --- CONTENT SECTION (Episodes & Player) --- */}
+      {/* --- CONTENT SECTION --- */}
       <div className="max-w-7xl mx-auto px-4 py-12 relative z-10">
         
         {/* Conditional Video Player */}
@@ -221,9 +216,16 @@ export const Watch = () => {
              <div className="aspect-video w-full bg-black rounded-xl overflow-hidden shadow-2xl border border-[#333] relative">
                {videoUrl ? (
                   <MediaPlayer title={animeInfo?.title} src={videoUrl} aspectRatio="16/9" load="eager">
-                    <MediaProvider>
-                      <Poster className="absolute inset-0 block h-full w-full object-cover" src={animeInfo?.image} alt={animeInfo?.title} />
-                    </MediaProvider>
+                    {/* FIXED: MediaProvider is now self-closing */}
+                    <MediaProvider />
+                    
+                    {/* FIXED: Poster is now a sibling, not a child, so it won't trap the video */}
+                    <Poster 
+                    className="absolute inset-0 block h-full w-full rounded-md opacity-0 transition-opacity data-[visible]:opacity-100 object-cover" 
+                    src={animeInfo?.image} 
+                    alt={animeInfo?.title} 
+                    />
+                    
                     <DefaultVideoLayout icons={defaultLayoutIcons} />
                   </MediaPlayer>
                ) : (
