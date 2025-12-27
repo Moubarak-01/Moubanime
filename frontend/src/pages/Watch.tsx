@@ -2,7 +2,9 @@ import { useEffect, useState, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { Navbar } from '../components/Navbar';
-import { MediaPlayer, MediaProvider, Poster } from '@vidstack/react';
+import { MediaPlayer, MediaProvider, Poster, Track, Captions } from '@vidstack/react';
+// Import caption styles
+import '@vidstack/react/player/styles/default/captions.css';
 import '@vidstack/react/player/styles/default/theme.css';
 import '@vidstack/react/player/styles/default/layouts/video.css';
 import { defaultLayoutIcons, DefaultVideoLayout } from '@vidstack/react/player/layouts/default';
@@ -20,6 +22,7 @@ export const Watch = () => {
   
   // States
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
+  const [subtitles, setSubtitles] = useState<any[]>([]); // FIXED: Moved State to Top Level
   const [watchedEpisodes, setWatchedEpisodes] = useState<string[]>([]);
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
   const [isMyList, setIsMyList] = useState(false);
@@ -61,8 +64,13 @@ export const Watch = () => {
       try {
         setVideoUrl(''); 
         setDownloadUrl(null);
+        setSubtitles([]); // Reset subtitles for new episode
+
         const { data } = await axios.get(`http://localhost:3000/anime/watch/${currentEpisode}`);
         if (data.download) setDownloadUrl(data.download);
+
+        // FIXED: Save subtitles here where 'data' actually exists
+        if (data.subtitles) setSubtitles(data.subtitles);
         
         const source = data.sources.find((s: any) => s.quality === 'default' || s.quality === 'auto') || data.sources[0];
         if (source?.url) setVideoUrl(`${PROXY_URL}${encodeURIComponent(source.url)}`);
@@ -93,6 +101,7 @@ export const Watch = () => {
       setCurrentEpisode(episodes[0].id);
       setTimeout(() => playerRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
     }
+    // FIXED: Removed the broken code from here
   };
 
   return (
@@ -215,15 +224,40 @@ export const Watch = () => {
            <div ref={playerRef} className="scroll-mt-24 mb-16 animate-fade-in">
              <div className="aspect-video w-full bg-black rounded-xl overflow-hidden shadow-2xl border border-[#333] relative">
                {videoUrl ? (
-                  <MediaPlayer title={animeInfo?.title} src={videoUrl} aspectRatio="16/9" load="eager">
-                    {/* FIXED: MediaProvider is now self-closing */}
+                  <MediaPlayer title={animeInfo?.title} src={videoUrl} aspectRatio="16/9" load="eager" crossOrigin>
+                    {/* FIXED: MediaProvider is self-closing */}
                     <MediaProvider />
+
+                    {/* FIXED: Mapped Subtitles inside the JSX where they belong */}
+                    {subtitles.map((sub, index) => {
+                    // 1. CHECK: Try to find a valid link property
+                    const subUrl = sub.url || sub.file || sub.uri;
+
+                    // 2. SAFEGUARD: If no link exists (like in your console log), SKIP this subtitle
+                    // This stops the "undefined" error and allows the player to find embedded subs naturally.
+                    if (!subUrl) return null;
+
+                        return (
+                            <Track
+                            key={index}
+                            src={`${PROXY_URL}${encodeURIComponent(subUrl)}`} 
+                            kind="subtitles"
+                            label={sub.lang}
+                            lang={sub.lang}
+                            type="vtt"
+                            default={sub.lang === 'English'}
+                            />
+                        );
+                        })}
                     
-                    {/* FIXED: Poster is now a sibling, not a child, so it won't trap the video */}
+                    {/* Captions Component */}
+                    <Captions className="vds-captions" />
+                    
+                    {/* FIXED: Poster as Sibling (kept your opacity classes since you said this layout works for you) */}
                     <Poster 
-                    className="absolute inset-0 block h-full w-full rounded-md opacity-0 transition-opacity data-[visible]:opacity-100 object-cover" 
-                    src={animeInfo?.image} 
-                    alt={animeInfo?.title} 
+                      className="absolute inset-0 block h-full w-full rounded-md opacity-0 transition-opacity data-[visible]:opacity-100 object-cover" 
+                      src={animeInfo?.image} 
+                      alt={animeInfo?.title} 
                     />
                     
                     <DefaultVideoLayout icons={defaultLayoutIcons} />
