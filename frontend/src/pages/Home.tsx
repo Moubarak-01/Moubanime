@@ -9,6 +9,8 @@ interface AnimeResult {
   title: string;
   image: string;
   banner?: string;
+  poster?: string;
+  cover?: string;
   description?: string;
   type?: string;
 }
@@ -44,12 +46,21 @@ export const Home = () => {
     const saved = localStorage.getItem('my-list');
     const list = saved ? JSON.parse(saved) : [];
     
+    // Check if duplicate
     if (!list.some((a: any) => a.id === heroAnime.id)) {
+      
+      // --- THE FIX IS HERE ---
+      // We now save ALL image possibilities, not just 'image'.
+      // This ensures that if it's a Trending item (Banner), we save the banner too.
       const newItem = {
         id: heroAnime.id,
         title: heroAnime.title,
-        image: heroAnime.image 
+        image: heroAnime.image,
+        banner: heroAnime.banner,  // <--- Saving the Banner
+        poster: heroAnime.poster,  // <--- Saving the Poster
+        cover: heroAnime.cover     // <--- Saving the Cover
       };
+      
       const newList = [newItem, ...list];
       localStorage.setItem('my-list', JSON.stringify(newList));
       alert(`${heroAnime.title} added to My List!`);
@@ -113,15 +124,14 @@ export const Home = () => {
       {/* 2. SCROLLABLE ROWS */}
       <div className="px-4 md:px-8 py-6 space-y-10">
         
-        {/* Trending Row - NOW USES LANDSCAPE VARIANT */}
+        {/* Trending Row - Landscape Cards */}
         <section>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg md:text-2xl font-bold border-l-4 border-[#f47521] pl-3">Trending Now</h2>
           </div>
-          <div className="flex overflow-x-auto gap-3 md:gap-4 pb-4 custom-scrollbar snap-x scroll-pl-4">
+          <div className="flex overflow-x-auto gap-4 md:gap-6 pb-4 custom-scrollbar snap-x scroll-pl-4">
             {trending.map((anime) => (
-              <div key={anime.id} className="min-w-[200px] md:min-w-[280px] snap-start">
-                 {/* 💡 WE FORCE LANDSCAPE MODE HERE */}
+              <div key={anime.id} className="min-w-[280px] md:min-w-[450px] snap-start">
                  <Link to={`/watch/${anime.id}`}>
                   <AnimeCard anime={anime} variant="landscape" />
                 </Link>
@@ -130,13 +140,12 @@ export const Home = () => {
           </div>
         </section>
 
-        {/* Popular Row - DEFAULTS TO PORTRAIT */}
+        {/* Popular Row - Portrait Cards */}
         <section>
           <h2 className="text-lg md:text-2xl font-bold mb-4 border-l-4 border-[#f47521] pl-3">Most Popular</h2>
           <div className="flex overflow-x-auto gap-3 md:gap-4 pb-4 custom-scrollbar snap-x scroll-pl-4">
             {popular.map((anime) => (
               <div key={anime.id} className="min-w-[130px] md:min-w-[200px] snap-start">
-                {/* 💡 NO VARIANT = DEFAULTS TO TALL POSTERS */}
                 <Link to={`/watch/${anime.id}`}>
                   <AnimeCard anime={anime} />
                 </Link>

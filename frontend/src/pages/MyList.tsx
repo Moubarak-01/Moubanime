@@ -1,47 +1,67 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Navbar } from '../components/Navbar';
 import { AnimeCard } from '../components/AnimeCard';
 import { Link } from 'react-router-dom';
 
-interface SavedAnime {
-  id: string;
-  title: string;
-  image: string;
-}
-
 export const MyList = () => {
-  const [myList, setMyList] = useState<SavedAnime[]>([]);
+  const [myList, setMyList] = useState<any[]>([]);
 
   useEffect(() => {
+    // Load list from local storage
     const saved = localStorage.getItem('my-list');
     if (saved) {
       setMyList(JSON.parse(saved));
     }
   }, []);
 
+  const removeFromList = (id: string) => {
+    const updatedList = myList.filter(anime => anime.id !== id);
+    setMyList(updatedList);
+    localStorage.setItem('my-list', JSON.stringify(updatedList));
+  };
+
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-[#000] text-white overflow-x-hidden">
       <Navbar />
       
       <div className="max-w-7xl mx-auto px-4 py-8">
-        <h2 className="text-3xl font-bold mb-8 border-l-4 border-[#f47521] pl-4">
-          My List
-        </h2>
+        <h1 className="text-3xl font-bold mb-8 border-l-4 border-[#f47521] pl-4">My List</h1>
+        
+        {myList.length > 0 ? (
+          // Horizontal Scroll Container
+          <div className="flex overflow-x-auto gap-4 pb-4 custom-scrollbar snap-x scroll-pl-4">
+            {myList.map((anime) => (
+              // CHANGE: Set exact width to 300px to match your AnimeCard placeholder size
+              <div key={anime.id} className="max-w-[320px] snap-start relative group">
+                
+                <Link to={`/watch/${anime.id}`}>
+                  {/* Landscape Variant */}
+                  <AnimeCard anime={anime} variant="landscape" />
+                </Link>
 
-        {myList.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 text-gray-500">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-16 h-16 mb-4">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
-            </svg>
-            <p className="text-xl">Your list is empty.</p>
+                {/* Remove Button (X) */}
+                <button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    removeFromList(anime.id);
+                  }}
+                  className="absolute top-2 right-2 bg-red-600 hover:bg-red-700 text-white p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-md z-10"
+                  title="Remove from list"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+
+              </div>
+            ))}
           </div>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
-            {myList.map((anime) => (
-              <Link key={anime.id} to={`/watch/${anime.id}`}>
-                <AnimeCard anime={anime} />
-              </Link>
-            ))}
+          <div className="flex flex-col items-center justify-center h-64 text-gray-500">
+            <p className="text-xl mb-4">Your list is empty</p>
+            <Link to="/" className="text-[#f47521] hover:underline">
+              Go add some anime!
+            </Link>
           </div>
         )}
       </div>
